@@ -1,0 +1,27 @@
+---
+import FooterLink from "@/components/ui/app/FooterLInk.astro";
+import { type NavItem } from "@/types";
+
+const year = new Date().getFullYear();
+
+const links: NavItem[] = [
+    { href: "/blog", label: "Blog" },
+    { href: "/projects", label: "Proyectos" },
+    { href: "/events", label: "Eventos" },
+];
+---
+
+<footer class="border-t border-border bg-neutral-50 dark:bg-neutral-900">
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div
+            class="flex flex-col items-center justify-between gap-4 sm:flex-row"
+        >
+            <p class="text-sm text-accent-foreground">
+                &copy; {year} EduStack Smart
+            </p>
+            <div class="flex items-center gap-4">
+                {links.map((link) => <FooterLink {...link} />)}
+            </div>
+        </div>
+    </div>
+</footer>

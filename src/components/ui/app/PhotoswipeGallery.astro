@@ -1,0 +1,61 @@
+---
+import { getIdealResponsiveMediaLink } from "@/lib/utils/media";
+import type { Media } from "@/types";
+import { Picture } from "astro:assets";
+import "photoswipe/style.css";
+
+type Props = {
+    gallery: Media[];
+    alt: string;
+    imageKey: string;
+};
+
+const { gallery, alt, imageKey } = Astro.props;
+---
+
+<div id="gallery" class="grid grid-cols-1 lg:grid-cols-3 gap-5 my-16">
+    {
+        gallery.map((item) => {
+            const src = item.urls[imageKey] ?? item.urls.original;
+            const dimensions =
+                item.dimensions[imageKey] ?? item.dimensions.main;
+
+            return (
+                <a
+                    href={src}
+                    data-pswp-width={dimensions.width}
+                    data-pswp-height={dimensions.height}
+                    target="_blank"
+                >
+                    <Picture
+                        src={getIdealResponsiveMediaLink(item)}
+                        alt={alt + " - " + item.id}
+                        width={dimensions?.width}
+                        height={dimensions?.height}
+                        formats={["avif", "webp"]}
+                        class="h-full w-full rounded-md border border-border object-cover hover:scale-105 transition duration-300 cursor-pointer"
+                    />
+                </a>
+            );
+        })
+    }
+</div>
+
+<script>
+    import PhotoSwipeLightbox from "photoswipe/lightbox";
+
+    function initPhotoSwipe() {
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: "#gallery",
+            children: "a",
+            pswpModule: () => import("photoswipe"),
+        });
+        lightbox.init();
+    }
+
+    document.addEventListener("astro:page-load", () => {
+        if (document.querySelector("#gallery")) {
+            initPhotoSwipe();
+        }
+    });
+</script>

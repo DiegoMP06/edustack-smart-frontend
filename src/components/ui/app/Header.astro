@@ -1,0 +1,72 @@
+---
+import { type NavItem } from "@/types";
+import HeaderLink from "./HeaderLink.astro";
+import Logo from "./Logo.astro";
+import MenuMobile from "./MenuMobile";
+import SearchButton from "./SearchButton";
+import MobileLink from "./MobileLink.astro";
+
+type Props = {
+    withSearch?: boolean;
+};
+
+const LARAVEL_API_URL = import.meta.env.LARAVEL_API_URL;
+
+const links: NavItem[] = [
+    { href: "/blog", label: "Blog" },
+    { href: "/projects", label: "Proyectos" },
+    { href: "/events", label: "Eventos" },
+];
+
+const { withSearch  = false} = Astro.props;
+---
+
+<header
+    class="sticky top-0 z-30 border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80"
+>
+    <div
+        class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"
+    >
+        <a href="/">
+            <Logo />
+        </a>
+
+        <nav
+            aria-label="Navegación principal"
+            class="hidden md:flex items-center gap-1"
+            role="list"
+        >
+            {links.map((link) => <HeaderLink {...link} />)}
+        </nav>
+
+        <nav class="flex items-center gap-2">
+            {withSearch && <SearchButton client:load />}
+
+            <a
+                href={LARAVEL_API_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors cursor-pointer"
+            >
+                Ir al Panel
+            </a>
+
+            <MenuMobile client:load>
+                {
+                    links.map(({ href, label }) => (
+                        <MobileLink href={href} label={label} />
+                    ))
+                }
+
+                <a
+                    href={LARAVEL_API_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 rounded bg-indigo-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors cursor-pointer"
+                >
+                    Ir al Panel
+                </a>
+            </MenuMobile>
+        </nav>
+    </div>
+</header>

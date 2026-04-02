@@ -1,0 +1,27 @@
+---
+import { type NavItem } from "@/types";
+import { cn } from "@/lib/utils";
+
+type Props = NavItem & {
+    className?: string;
+};
+
+const { href, label, className } = Astro.props;
+
+const pathname = Astro.url.pathname;
+const isActive = pathname.startsWith(href);
+---
+
+<a
+    href={href}
+    class={cn(
+        "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+        isActive
+            ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+            : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100",
+        className,
+    )}
+    aria-current={isActive ? "page" : undefined}
+>
+    {label}
+</a>

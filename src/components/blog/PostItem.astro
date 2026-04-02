@@ -1,0 +1,86 @@
+---
+import Icon from "@/components/ui/app/Icon";
+import { formatDate } from "@/lib/utils/date";
+import { getIdealResponsiveMediaLink } from "@/lib/utils/media";
+import { type Post } from "@/types";
+import { Picture } from "astro:assets";
+import {
+    Item,
+    ItemContent,
+    ItemDescription,
+    ItemHeader,
+    ItemTitle,
+    ItemFooter,
+} from "@/components/ui/shadcn/item";
+
+type Props = {
+    post: Post;
+};
+
+const { post } = Astro.props;
+---
+
+<Item variant="outline" className="p-0 overflow-hidden" role="listitem">
+    <ItemHeader className="aspect-video overflow-hidden">
+        <a
+            href={`/blog/${post.slug}`}
+            tabindex="-1"
+            aria-hidden="true"
+            class="block w-full h-full"
+        >
+            <Picture
+                src={getIdealResponsiveMediaLink(post.media?.[0])}
+                alt={`Imagen de portada: ${post.name}`}
+                width={post.media?.[0].dimensions.main.width}
+                height={post.media?.[0].dimensions.main.height}
+                loading="lazy"
+                decoding="async"
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                formats={["avif", "webp", "jpeg"]}
+            />
+        </a>
+    </ItemHeader>
+
+    <ItemContent className="p-4">
+        <div class="flex items-center gap-2 mb-2">
+            <p
+                class="flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400"
+            >
+                <Icon className="size-4" iconName={post.type.icon} />
+                {post.type.name}
+            </p>
+
+            <span class="text-slate-300" aria-hidden="true"> · </span>
+
+            <time
+                datetime={post.published_at}
+                class="text-xs text-muted-foreground"
+            >
+                {formatDate(post.published_at)}
+            </time>
+        </div>
+
+        <ItemTitle>
+            <h2>
+                <a href={`/blog/${post.slug}`}>
+                    {post.name}
+                </a>
+            </h2>
+        </ItemTitle>
+
+        <ItemDescription>{post.summary}</ItemDescription>
+
+        <ItemFooter className="mt-4">
+            <p class="text-xs">
+                {post.author.name}
+                {post.author.father_last_name}
+                {post.author.mother_last_name}
+            </p>
+
+            <p class="flex items-center gap-1 text-xs">
+                <Icon className="size-4" iconName="clock" />
+                {post.reading_time_minutes} min
+            </p>
+        </ItemFooter>
+    </ItemContent>
+</Item>

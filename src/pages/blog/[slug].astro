@@ -1,0 +1,133 @@
+---
+import BlogAPI from "@/API/BlogAPI";
+import Icon from "@/components/ui/app/Icon";
+import Layout from "@/layouts/Layout.astro";
+import UserAvatar from "@/components/ui/app/UserAvatar";
+import { formatDate } from "@/lib/utils/date";
+import { getIdealResponsiveMediaLink } from "@/lib/utils/media";
+import { PostSchema } from "@/schemas/blog";
+import type { BreadcrumbItem, Post } from "@/types";
+import { Badge } from "@/components/ui/shadcn/badge";
+import PhotoswipeGallery from "@/components/ui/app/PhotoswipeGallery.astro";
+import { Render } from "@puckeditor/core";
+import { puckConfig } from "@/lib/puck";
+
+const { slug } = Astro.params as { slug: string };
+const clientIp = Astro.clientAddress;
+const userAgent = Astro.request.headers.get("user-agent") || "Unknown";
+
+const response = await BlogAPI.getPostBySlug({
+    slug,
+    clientIp,
+    userAgent,
+});
+
+const post = PostSchema.parse(response);
+
+const breadcrumbs: (post: Post) => BreadcrumbItem[] = (post) => [
+    {
+        title: "Inicio",
+        href: "/",
+    },
+    {
+        title: "Blog",
+        href: "/blog",
+    },
+    {
+        title: post.name,
+        href: `/blog/${post.slug}`,
+    },
+];
+
+console.log(post.content);
+---
+
+<Layout
+    title={post.name}
+    description={post.summary}
+    breadcrumbs={breadcrumbs(post)}
+>
+    <article class="mx-auto max-w-6xl px-4 py-12 md:px-6 lg:px-8">
+        <header class="mb-10">
+            <div class="mb-4 flex flex-wrap items-center gap-2">
+                <Badge variant="default">
+                    <Icon iconName={post.type.icon} className="size-3.5" />
+                    {post.type.name}
+                </Badge>
+
+                {
+                    post.categories.map((cat) => (
+                        <a href={`/blog?category=${cat.id}`}>
+                            <Badge variant="secondary">{cat.name}</Badge>
+                        </a>
+                    ))
+                }
+            </div>
+
+            <h1
+                class="mb-4 text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl"
+            >
+                {post.name}
+            </h1>
+
+            <p class="mb-6 text-lg leading-relaxed text-muted-foreground">
+                {post.summary}
+            </p>
+
+            <div class="flex items-center gap-3">
+                <UserAvatar client:load user={post.author} />
+
+                <div>
+                    <p class="text-sm font-medium text-foreground">
+                        {post.author.name}
+                        {post.author.father_last_name}
+                        {post.author.mother_last_name}
+                    </p>
+
+                    <div
+                        class="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                        <time datetime={post.published_at}>
+                            {formatDate(post.published_at)}
+                        </time>
+
+                        <span aria-hidden="true">·</span>
+
+                        <span class="flex items-center gap-1">
+                            <Icon iconName="clock" className="size-3" />
+                            {post.reading_time_minutes} min de lectura
+                        </span>
+
+                        <span aria-hidden="true">·</span>
+                        <span class="flex items-center gap-1">
+                            <Icon iconName="eye" className="size-3" />
+                            {post.views_count.toLocaleString("es-MX")} vistas
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <PhotoswipeGallery
+            gallery={post.media}
+            alt={post.name}
+            imageKey="main"
+        />
+
+        <div>
+            <Render config={puckConfig} data={{ content: post.content }} />
+        </div>
+
+        <footer
+            class="mt-12 border-t border-border pt-8"
+        >
+            <a
+                href="/blog"
+                class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+                <Icon iconName="arrow-left" className="size-4" />
+                Volver al Blog
+            </a>
+        </footer>
+    </article>
+</Layout>

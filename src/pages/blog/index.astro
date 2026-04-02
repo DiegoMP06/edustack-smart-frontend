@@ -1,0 +1,64 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import BlogAPI from "@/API/BlogAPI";
+import PostItem from "@/components/blog/PostItem.astro";
+import { PostsWithPagination } from "@/schemas/blog";
+import { type BreadcrumbItem } from "@/types";
+
+const search = Astro.url.searchParams.get("search") || "";
+const page = Number(Astro.url.searchParams.get("page") || "1");
+
+const response = await BlogAPI.getPosts({
+    page,
+    search,
+});
+
+const posts = PostsWithPagination.parse(response);
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: "Inicio",
+        href: "/",
+    },
+    {
+        title: "Blog",
+        href: "/blog",
+    },
+];
+---
+
+<Layout
+    withSearch
+    breadcrumbs={breadcrumbs}
+    title="Blog"
+    description="Artículos técnicos, noticias y recursos para estudiantes de Ingeniería en TI."
+>
+    <div class="mx-auto max-w-6xl px-4 py-12 md:px-6 lg:px-8">
+        <h1
+            class="text-3xl font-bold tracking-tight text-foreground md:text-4xl"
+        >
+            Blog
+        </h1>
+
+        <p class="mt-2 text-base text-muted-foreground">
+            Artículos técnicos, noticias y recursos para estudiantes.
+        </p>
+
+        {
+            posts.data.length === 0 ? (
+                <p class="text-center text-muted-foreground py-20">
+                    No hay artículos publicados aún.
+                </p>
+            ) : (
+                <div
+                    class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-10"
+                    role="list"
+                >
+                    {posts.data.map((post) => (
+                        <PostItem post={post} />
+                    ))}
+                </div>
+            )
+        }
+    </div>
+</Layout>
