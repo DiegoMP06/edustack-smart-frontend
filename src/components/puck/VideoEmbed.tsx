@@ -8,14 +8,16 @@ type VideoEmbedProps = {
 };
 
 const ASPECT: Record<string, string> = {
-    '16/9': 'aspect-video', 
+    '16/9': 'aspect-video', // Tailwind aspect-video = 16/9
     '4/3': 'aspect-[4/3]',
     '1/1': 'aspect-square',
 };
 
+
 function toEmbedUrl(raw: string, autoplay: boolean): string | null {
     const url = raw.trim();
 
+    // YouTube: varios formatos
     const ytMatch =
         url.match(
             /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/,
@@ -31,6 +33,7 @@ function toEmbedUrl(raw: string, autoplay: boolean): string | null {
         return `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?${params}`;
     }
 
+    // Vimeo
     const vimeoMatch = url.match(/(?:vimeo\.com\/)(\d+)/);
 
     if (vimeoMatch) {
@@ -42,6 +45,7 @@ function toEmbedUrl(raw: string, autoplay: boolean): string | null {
         return `https://player.vimeo.com/video/${vimeoMatch[1]}?${params}`;
     }
 
+    // URL de embed directa (iframe src)
     if (
         url.startsWith('http') &&
         (url.includes('embed') || url.includes('player'))

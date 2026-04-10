@@ -34,7 +34,7 @@ export default function TipTapEditorContainer({
                 '[&_th]:border [&_th]:border-border [&_th]:px-3 [&_th]:py-2 [&_th]:align-top',
                 '[&_th]:bg-muted [&_th]:font-semibold [&_th]:text-foreground',
                 '[&_.selectedCell]:bg-indigo-100',
-                '[&_.column-resize-handle]:absolute [&_.column-resize-handle]:top-0 [&_.column-resize-handle]:right-[-2px] [&_.column-resize-handle]:bottom-0 [&_.column-resize-handle]:w-1 [&_.column-resize-handle]:cursor-col-resize [&_.column-resize-handle]:bg-indigo-400',
+                '[&_.column-resize-handle]:absolute [&_.column-resize-handle]:top-0 [&_.column-resize-handle]:-right-0.5 [&_.column-resize-handle]:bottom-0 [&_.column-resize-handle]:w-1 [&_.column-resize-handle]:cursor-col-resize [&_.column-resize-handle]:bg-indigo-400',
                 '[&_ul[data-type=taskList]]:list-none [&_ul[data-type=taskList]]:pl-0',
                 '[&_li[data-type=taskItem]]:my-1 [&_li[data-type=taskItem]]:flex [&_li[data-type=taskItem]]:items-start [&_li[data-type=taskItem]]:gap-2',
                 '[&_li[data-type=taskItem]>label]:mt-0.5 [&_li[data-type=taskItem]>label]:flex [&_li[data-type=taskItem]>label]:items-center',

@@ -4,7 +4,6 @@ import Icon from "@/components/ui/app/Icon";
 import Layout from "@/layouts/Layout.astro";
 import UserAvatar from "@/components/ui/app/UserAvatar";
 import { formatDate } from "@/lib/utils/date";
-import { getIdealResponsiveMediaLink } from "@/lib/utils/media";
 import { PostSchema } from "@/schemas/blog";
 import type { BreadcrumbItem, Post } from "@/types";
 import { Badge } from "@/components/ui/shadcn/badge";
@@ -39,12 +38,11 @@ const breadcrumbs: (post: Post) => BreadcrumbItem[] = (post) => [
     },
 ];
 
-console.log(post.content);
 ---
 
 <Layout
     title={post.name}
-    description={post.summary}
+    description={post.description}
     breadcrumbs={breadcrumbs(post)}
 >
     <article class="mx-auto max-w-6xl px-4 py-12 md:px-6 lg:px-8">
@@ -71,7 +69,7 @@ console.log(post.content);
             </h1>
 
             <p class="mb-6 text-lg leading-relaxed text-muted-foreground">
-                {post.summary}
+                {post.description}
             </p>
 
             <div class="flex items-center gap-3">
@@ -115,12 +113,13 @@ console.log(post.content);
         />
 
         <div>
-            <Render config={puckConfig} data={{ content: post.content }} />
+            <Render
+                config={puckConfig}
+                data={{ content: post.content }}
+            />
         </div>
 
-        <footer
-            class="mt-12 border-t border-border pt-8"
-        >
+        <footer class="mt-12 border-t border-border pt-8">
             <a
                 href="/blog"
                 class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"

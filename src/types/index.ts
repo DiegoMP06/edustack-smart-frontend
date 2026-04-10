@@ -6,6 +6,7 @@ import type {
     ResponsiveImagesSchema,
 } from "@/schemas/media";
 import type { UserSchema } from "@/schemas";
+import type { ProjectSchema } from "@/schemas/projects";
 
 export type NavItem = {
     label: string;
@@ -26,3 +27,5 @@ export type ImageDimensions = z.infer<typeof ImageDimensionsSchema>;
 export type Media = z.infer<typeof MediaSchema>;
 
 export type Post = z.infer<typeof PostSchema>;
+
+export type Project = z.infer<typeof ProjectSchema>;

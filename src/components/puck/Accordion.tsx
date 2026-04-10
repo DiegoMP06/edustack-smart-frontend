@@ -1,5 +1,3 @@
-'use client';
-
 import type { ComponentConfig } from '@puckeditor/core';
 import { useState } from 'react';
 
@@ -11,6 +9,7 @@ type AccordionItem = {
 type AccordionProps = {
     title?: string;
     items: AccordionItem[];
+    /** Permitir múltiples abiertos a la vez */
     multiple: boolean;
     variant: 'default' | 'separated' | 'bordered';
 };

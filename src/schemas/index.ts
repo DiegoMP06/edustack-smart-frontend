@@ -41,3 +41,10 @@ export const UserSchema = z.object({
     updated_at: z.string(),
     deleted_at: z.string().nullable(),
 });
+
+export const collaboratorSchema = UserSchema.extend({
+    pivot: z.object({
+        id: z.number(),
+        role: z.string(),
+    }),
+});

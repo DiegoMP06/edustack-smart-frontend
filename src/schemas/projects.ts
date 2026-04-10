@@ -1,18 +1,18 @@
 import { z } from "astro/zod";
 import { PuckContentSchema } from "./puck";
-import { PaginationSchema, UserSchema } from ".";
 import { MediaSchema } from "./media";
+import { collaboratorSchema, PaginationSchema, UserSchema } from ".";
 
-export const PostTypeSchema = z.object({
+export const ProjectStatusSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
     description: z.string(),
-    icon: z.string(),
+    color: z.string(),
     order: z.number(),
 });
 
-export const PostCategorySchema = z.object({
+export const ProjectCategorySchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
@@ -21,28 +21,31 @@ export const PostCategorySchema = z.object({
     order: z.number(),
 });
 
-export const PostSchema = z.object({
+export const ProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
     description: z.string(),
     content: PuckContentSchema,
-    views_count: z.number(),
-    reading_time_minutes: z.number(),
+    repository_url: z.url(),
+    demo_url: z.url(),
+    tech_stack: z.array(z.string()),
+    version: z.string(),
+    license: z.string(),
     is_featured: z.boolean(),
     is_published: z.boolean(),
     published_at: z.string(),
-    post_type_id: z.number(),
+    project_status_id: z.number(),
     user_id: z.number(),
     created_at: z.string(),
     updated_at: z.string(),
-    deleted_at: z.string().nullable(),
-    type: PostTypeSchema,
-    categories: z.array(PostCategorySchema),
-    author: UserSchema,
     media: z.array(MediaSchema),
+    categories: z.array(ProjectCategorySchema),
+    status: ProjectStatusSchema,
+    collaborators: z.array(collaboratorSchema),
+    author: UserSchema,
 });
 
-export const PostsWithPagination = PaginationSchema.extend({
-    data: z.array(PostSchema),
+export const ProjectsWithPagination = PaginationSchema.extend({
+    data: z.array(ProjectSchema),
 });

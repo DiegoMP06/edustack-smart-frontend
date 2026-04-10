@@ -1,7 +1,252 @@
 ---
+import ProjectsAPI from "@/API/ProjectsAPI";
+import Icon from "@/components/ui/app/Icon";
+import PhotoswipeGallery from "@/components/ui/app/PhotoswipeGallery.astro";
+import UserAvatar from "@/components/ui/app/UserAvatar";
+import { Badge } from "@/components/ui/shadcn/badge";
 import Layout from "@/layouts/Layout.astro";
+import { puckConfig } from "@/lib/puck";
+import { formatDate } from "@/lib/utils/date";
+import { ProjectSchema } from "@/schemas/projects";
+import type { BreadcrumbItem, Project } from "@/types";
+import { Render } from "@puckeditor/core";
+import {
+    Card,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from "@/components/ui/shadcn/card";
+import { PROJECT_COLLABORATOR_ROLE } from "@/consts/projects";
+
+const { slug } = Astro.params as { slug: string };
+
+const response = await ProjectsAPI.getProjectBySlug({
+    slug,
+});
+
+const project = ProjectSchema.parse(response);
+
+const breadcrumbs: (project: Project) => BreadcrumbItem[] = (project) => [
+    {
+        title: "Inicio",
+        href: "/",
+    },
+    {
+        title: "Proyectos",
+        href: "/projects",
+    },
+    {
+        title: project.name,
+        href: `/projects/${project.slug}`,
+    },
+];
 ---
 
-<Layout title="Blog">
-    <h1 class="">Projects.[slug]</h1>
+<Layout
+    title={project.name}
+    description={project.description}
+    breadcrumbs={breadcrumbs(project)}
+>
+    <article class="mx-auto max-w-6xl px-4 py-12 md:px-6 lg:px-8">
+        <div class="grid gap-10 lg:grid-cols-3">
+            <div class="lg:col-span-2 space-y-8">
+                <header class="mb-10">
+                    <div class="mb-4 flex flex-wrap items-center gap-2">
+                        <Badge variant="default">
+                            {project.status.name}
+                        </Badge>
+
+                        {
+                            project.categories.map((cat) => (
+                                <a href={`/projects?category=${cat.id}`}>
+                                    <Badge variant="secondary">
+                                        {cat.name}
+                                    </Badge>
+                                </a>
+                            ))
+                        }
+                    </div>
+
+                    <h1
+                        class="mb-4 text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl"
+                    >
+                        {project.name}
+                    </h1>
+
+                    <p
+                        class="mb-6 text-lg leading-relaxed text-muted-foreground"
+                    >
+                        {project.description}
+                    </p>
+
+                    <div class="flex items-center gap-3">
+                        <UserAvatar client:load user={project.author} />
+
+                        <div>
+                            <p class="text-sm font-medium text-foreground">
+                                {project.author.name}
+                                {project.author.father_last_name}
+                                {project.author.mother_last_name}
+                            </p>
+
+                            <div
+                                class="flex items-center gap-2 text-xs text-muted-foreground"
+                            >
+                                <time datetime={project.published_at}>
+                                    {formatDate(project.published_at)}
+                                </time>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <PhotoswipeGallery
+                    gallery={project.media}
+                    alt={project.name}
+                    imageKey="main"
+                />
+
+                <div>
+                    <Render
+                        config={puckConfig}
+                        data={{ content: project.content }}
+                    />
+                </div>
+            </div>
+
+            <aside class="space-y-6 lg:sticky lg:top-24 self-start">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            <h2>Enlaces</h2>
+                        </CardTitle>
+                        <CardDescription>
+                            Los enlaces a los repositorios y demo en vivo.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="gap-2 flex flex-col">
+                        <a
+                            href={project.repository_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 justify-center rounded-xl border border-border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors dark:hover:bg-neutral-800 dark:text-neutral-300"
+                        >
+                            <Icon iconName="git-branch" className="size-4" />
+                            Ver repositorio
+                        </a>
+
+                        <a
+                            href={project.demo_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors w-full"
+                        >
+                            <Icon iconName="link-2" className="size-4" />
+                            Demo en vivo
+                        </a>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            <h2>Detalles</h2>
+                        </CardTitle>
+                        <CardDescription>
+                            Información detallada del proyecto.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-foreground">Versión: </span>
+                            <span class="font-medium text-muted-foreground">
+                                v{project.version}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between text-sm">
+                            <span class="text-foreground">Licencia: </span>
+                            <span class="font-medium text-muted-foreground">
+                                {project.license}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between text-sm">
+                            <span class="text-foreground">Autor: </span>
+                            <span class="font-medium text-muted-foreground">
+                                {project.author.name}
+                                {project.author.father_last_name}
+                                {project.author.mother_last_name}
+                            </span>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            <h2>Stack tecnológico</h2>
+                        </CardTitle>
+                        <CardDescription>
+                            Tecnologías usadas en el proyecto.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap gap-2">
+                        {
+                            project.tech_stack.map((tech) => (
+                                <Badge variant="secondary">{tech}</Badge>
+                            ))
+                        }
+                    </CardContent>
+                </Card>
+
+                {
+                    project.collaborators.length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>
+                                    <h2>Colaboradores</h2>
+                                </CardTitle>
+                                <CardDescription>
+                                    Tecnologías usadas en el proyecto.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ul class="space-y-2 divide-y divide-border">
+                                    {project.collaborators.map((c) => (
+                                        <li class="flex items-center justify-between p-1.5">
+                                            <span class="font-medium  text-sm">
+                                                {c.name} {c.father_last_name}{" "}
+                                                {c.mother_last_name}
+                                            </span>
+
+                                            <span class="text-muted-foreground capitalize text-xs">
+                                                {
+                                                    PROJECT_COLLABORATOR_ROLE[
+                                                        c.pivot.role
+                                                    ]
+                                                }
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    )
+                }
+            </aside>
+        </div>
+
+        <footer class="mt-12 border-t border-border pt-8">
+            <a
+                href="/projects"
+                class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+                <Icon iconName="arrow-left" className="size-4" />
+                Volver a Proyectos
+            </a>
+        </footer>
+    </article>
 </Layout>
